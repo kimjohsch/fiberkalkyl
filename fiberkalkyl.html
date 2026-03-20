@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang='sv'>
+<head>
+<meta charset='UTF-8'>
+<title>Fiberkalkyl</title>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<link rel='manifest' href='manifest.json'>
+<script>
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register('service-worker.js'); }
+</script>
+<style>
+ body { font-family: Arial; padding:20px; }
+ input { width:100%; padding:8px; margin:6px 0; }
+ .card { border:1px solid #ccc; padding:15px; border-radius:8px; margin-bottom:20px; }
+ button { padding:12px; width:100%; background:#0078d4; color:white; border:none; border-radius:6px; font-size:16px; }
+</style>
+</head>
+<body>
+<h2>Fiberkalkyl – Version 2</h2>
+<div class='card'>
+  <h3>Material</h3>
+  <label>Meter fiberkabel:</label><input id='fiber_m' type='number' value='0'>
+  <label>Pris per meter fiber:</label><input id='fiber_pris' type='number' value='12'>
+  <label>Antal uttag:</label><input id='uttag' type='number' value='0'>
+  <label>Pris per uttag:</label><input id='uttag_pris' type='number' value='180'>
+  <label>Antal ODF:</label><input id='odf' type='number' value='0'>
+  <label>Pris per ODF:</label><input id='odf_pris' type='number' value='900'>
+  <label>Antal skåp:</label><input id='skap' type='number' value='0'>
+  <label>Pris per skåp:</label><input id='skap_pris' type='number' value='2500'>
+  <label>Övrigt material:</label><input id='ovrigt' type='number' value='0'>
+</div>
+<div class='card'>
+  <h3>Arbetstid</h3>
+  <label>Timmar:</label><input id='timmar' type='number' value='0'>
+  <label>Timkostnad:</label><input id='timpris' type='number' value='520'>
+</div>
+<div class='card'>
+  <h3>Pålägg & Marginal</h3>
+  <label>Pålägg %:</label><input id='palagg' type='number' value='10'>
+  <label>Marginal %:</label><input id='marginal' type='number' value='5'>
+</div>
+<button onclick='calc()'>Beräkna totalsumma</button>
+<h3>Resultat</h3>
+<p id='r_mat'>Material: 0 kr</p>
+<p id='r_arb'>Arbete: 0 kr</p>
+<p id='r_tot'>Total: 0 kr</p>
+<script>
+function calc(){
+ let fm=+fiber_m.value||0, fp=+fiber_pris.value||0;
+ let u=+uttag.value||0, up=+uttag_pris.value||0;
+ let od=+odf.value||0, odp=+odf_pris.value||0;
+ let sk=+skap.value||0, skp=+skap_pris.value||0;
+ let ov=+ovrigt.value||0;
+ let tim=+timmar.value||0, timpr=+timpris.value||0;
+ let pal=+palagg.value||0, mar=+marginal.value||0;
+ let mat = fm*fp + u*up + od*odp + sk*skp + ov;
+ let arb = tim*timpr;
+ let sub = mat + arb;
+ let total = sub + sub*(pal/100) + sub*(mar/100);
+ r_mat.textContent = 'Material: '+mat.toFixed(2)+' kr';
+ r_arb.textContent = 'Arbete: '+arb.toFixed(2)+' kr';
+ r_tot.textContent = 'Total: '+total.toFixed(2)+' kr';
+}
+</script>
+</body>
+</html>
