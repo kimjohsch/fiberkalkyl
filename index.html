@@ -1,67 +1,46 @@
 
-<!DOCTYPE html>
-<html lang='sv'>
-<head>
-<meta charset='UTF-8'>
-<title>Fiberkalkyl</title>
+<!DOCTYPE html><html lang='sv'><head><meta charset='UTF-8'>
+<title>Fiberkalkyl V3</title>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
 <link rel='manifest' href='manifest.json'>
-<script>
-if ('serviceWorker' in navigator) { navigator.serviceWorker.register('service-worker.js'); }
-</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('service-worker.js');}</script>
 <style>
- body { font-family: Arial; padding:20px; }
- input { width:100%; padding:8px; margin:6px 0; }
- .card { border:1px solid #ccc; padding:15px; border-radius:8px; margin-bottom:20px; }
- button { padding:12px; width:100%; background:#0078d4; color:white; border:none; border-radius:6px; font-size:16px; }
-</style>
-</head>
-<body>
-<h2>Fiberkalkyl – Version 2</h2>
-<div class='card'>
-  <h3>Material</h3>
-  <label>Meter fiberkabel:</label><input id='fiber_m' type='number' value='0'>
-  <label>Pris per meter fiber:</label><input id='fiber_pris' type='number' value='12'>
-  <label>Antal uttag:</label><input id='uttag' type='number' value='0'>
-  <label>Pris per uttag:</label><input id='uttag_pris' type='number' value='180'>
-  <label>Antal ODF:</label><input id='odf' type='number' value='0'>
-  <label>Pris per ODF:</label><input id='odf_pris' type='number' value='900'>
-  <label>Antal skåp:</label><input id='skap' type='number' value='0'>
-  <label>Pris per skåp:</label><input id='skap_pris' type='number' value='2500'>
-  <label>Övrigt material:</label><input id='ovrigt' type='number' value='0'>
+ body{font-family:Arial;background:#f8f9fc;margin:0;padding:20px;}
+ h2{color:#1a4fb3;margin-bottom:20px;}
+ .nav{display:flex;gap:10px;margin-bottom:20px;}
+ button{background:#1a4fb3;color:white;border:none;padding:10px 15px;border-radius:6px;}
+ .card{background:white;padding:15px;border-radius:8px;box-shadow:0 0 5px #ccc;margin-bottom:20px;}
+ .input{width:100%;padding:8px;margin:6px 0;border:1px solid #ccc;border-radius:6px;}
+ table{width:100%;border-collapse:collapse;}
+ td,th{padding:6px;border-bottom:1px solid #ddd;}
+ .pdf{background:#28a745;}
+</style></head><body>
+<h2>Fiberkalkyl – Version 3</h2>
+<div class='nav'>
+<button onclick="show('fiber')">Fiberinstallation</button>
+<button onclick="show('koppar')">Koppardata</button>
+<button onclick="show('reg')">Materialregister</button>
+<button class='pdf' onclick="exportPDF()">Exportera PDF</button>
 </div>
-<div class='card'>
-  <h3>Arbetstid</h3>
-  <label>Timmar:</label><input id='timmar' type='number' value='0'>
-  <label>Timkostnad:</label><input id='timpris' type='number' value='520'>
+<div id='fiber' class='card'>
+<h3>Fiberinstallation</h3>
+<label>Meter fiber:</label><input class='input' id='fiber_m'>
+<label>Pris/m:</label><input class='input' id='fiber_pris'>
 </div>
-<div class='card'>
-  <h3>Pålägg & Marginal</h3>
-  <label>Pålägg %:</label><input id='palagg' type='number' value='10'>
-  <label>Marginal %:</label><input id='marginal' type='number' value='5'>
+<div id='koppar' class='card' style='display:none;'>
+<h3>Koppardata</h3>
+<label>Meter Cat6a:</label><input class='input' id='cat_m'>
+<label>Pris/m:</label><input class='input' id='cat_pris'>
 </div>
-<button onclick='calc()'>Beräkna totalsumma</button>
-<h3>Resultat</h3>
-<p id='r_mat'>Material: 0 kr</p>
-<p id='r_arb'>Arbete: 0 kr</p>
-<p id='r_tot'>Total: 0 kr</p>
+<div id='reg' class='card' style='display:none;'>
+<h3>Materialregister</h3>
+<table><tr><th>Artikel</th><th>E-nummer</th><th>Pris</th></tr>
+<tr><td>12F Fiberkabel</td><td>5012345</td><td>12 kr/m</td></tr>
+<tr><td>Cat6a kabel</td><td>2023456</td><td>5 kr/m</td></tr>
+</table>
+</div>
 <script>
-function calc(){
- let fm=+fiber_m.value||0, fp=+fiber_pris.value||0;
- let u=+uttag.value||0, up=+uttag_pris.value||0;
- let od=+odf.value||0, odp=+odf_pris.value||0;
- let sk=+skap.value||0, skp=+skap_pris.value||0;
- let ov=+ovrigt.value||0;
- let tim=+timmar.value||0, timpr=+timpris.value||0;
- let pal=+palagg.value||0, mar=+marginal.value||0;
- let mat = fm*fp + u*up + od*odp + sk*skp + ov;
- let arb = tim*timpr;
- let sub = mat + arb;
- let total = sub + sub*(pal/100) + sub*(mar/100);
- r_mat.textContent = 'Material: '+mat.toFixed(2)+' kr';
- r_arb.textContent = 'Arbete: '+arb.toFixed(2)+' kr';
- r_tot.textContent = 'Total: '+total.toFixed(2)+' kr';
-}
+function show(x){['fiber','koppar','reg'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById(x).style.display='block';}
+function exportPDF(){alert('PDF-export kommer i nästa version.');}
 </script>
-</body>
-</html>
+</body></html>
