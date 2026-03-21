@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang='sv'>
+<head>
+<meta charset='UTF-8'>
+<title>Kalkylverktyg</title>
+<style>
+ body { font-family: Arial; margin: 20px; }
+ .box { border:1px solid #ccc; padding:15px; margin-bottom:20px; }
+</style>
+</head>
+<body>
+<h2>Fiber / Koppar Kalkyl</h2>
+<div class='box'>
+<label>Välj kalkyltyp:</label>
+<select id='calcType'>
+<option value='fiber'>Fiberinstallation</option>
+<option value='copper'>Kopparinstallation</option>
+</select>
+</div>
+
+<div class='box'>
+<h3>Artiklar</h3>
+<select id='articleSelect'>
+<option value=''>Välj artikel</option>
+<option value='fiberkabel_om4'>OM4 Fiberkabel 12x50/125</option>
+<option value='cat6_kabel'>Cat6 U/UTP Kabel</option>
+<option value='patchpanel_24p'>Patchpanel 24-port</option>
+<option value='kassett_fiber'>Fiberkassett</option>
+</select>
+<button onclick='addArticle()'>Lägg till artikel</button>
+<ul id='articleList'></ul>
+</div>
+
+<div class='box'>
+<h3>Egna artiklar</h3>
+<input id='customName' placeholder='Artikelnamn'>
+<input id='customPrice' placeholder='Pris' type='number'>
+<button onclick='addCustom()'>Lägg till egen artikel</button>
+<ul id='customList'></ul>
+</div>
+
+<div class='box'>
+<h3>Arbetsmoment</h3>
+<input id='taskName' placeholder='Momentnamn'>
+<input id='taskTime' placeholder='Tid (min)' type='number'>
+<button onclick='addTask()'>Lägg till moment</button>
+<ul id='taskList'></ul>
+</div>
+
+<div class='box'>
+<h3>Summering</h3>
+<button onclick='summarize()'>Beräkna</button>
+<p id='summary'></p>
+</div>
+
+<script>
+let articles = [];
+let customArticles = [];
+let tasks = [];
+
+function addArticle(){
+ let sel = document.getElementById('articleSelect');
+ if(sel.value){ articles.push(sel.options[sel.selectedIndex].text); render(); }
+}
+
+function addCustom(){
+ let n=document.getElementById('customName').value;
+ let p=document.getElementById('customPrice').value;
+ if(n && p){ customArticles.push(n+" ("+p+" kr)"); render(); }
+}
+
+function addTask(){
+ let n=document.getElementById('taskName').value;
+ let t=document.getElementById('taskTime').value;
+ if(n && t){ tasks.push({name:n,time:parseInt(t)}); render(); }
+}
+
+function render(){
+ document.getElementById('articleList').innerHTML = articles.map(a=>"<li>"+a+"</li>").join('');
+ document.getElementById('customList').innerHTML = customArticles.map(a=>"<li>"+a+"</li>").join('');
+ document.getElementById('taskList').innerHTML = tasks.map(t=>"<li>"+t.name+" - "+t.time+" min</li>").join('');
+}
+
+function summarize(){
+ let totalTime = tasks.reduce((s,t)=>s+t.time,0);
+ document.getElementById('summary').innerText = "Total arbetstid: "+totalTime+" minuter ("+(totalTime/60).toFixed(2)+" timmar)";
+}
+</script>
+</body>
+</html>
