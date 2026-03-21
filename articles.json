@@ -1,0 +1,34 @@
+{
+  "fiber": {
+    "Kablar": [
+      {
+        "name": "OM4 12-fiberkabel",
+        "unit": "m",
+        "price": 9.5
+      }
+    ],
+    "Skarvboxar": [
+      {
+        "name": "Skarvbox IP54 vägg",
+        "unit": "st",
+        "price": 490
+      }
+    ]
+  },
+  "copper": {
+    "Kablar": [
+      {
+        "name": "Cat6 U/UTP installationskabel",
+        "unit": "m",
+        "price": 4.9
+      }
+    ],
+    "Uttag": [
+      {
+        "name": "RJ45 moduluttag vit",
+        "unit": "st",
+        "price": 29
+      }
+    ]
+  }
+}

@@ -1,38 +1,53 @@
 
-<!DOCTYPE html>
-<html><head><meta charset='UTF-8'>
-<title>Fiberkalkyl v7</title>
+<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Fiberkalkyl v7 Pro</title>
 <link rel='manifest' href='manifest.json'>
 <script>navigator.serviceWorker.register('sw.js');</script>
 <style>
-body{font-family:Arial;margin:20px;background:#f5f5f5}
-.box{background:#fff;padding:15px;margin:10px 0;border-radius:8px}
-</style>
-</head><body>
-<h2>Fiberkalkyl v7</h2>
-<button onclick='exportJSON()'>Exportera kalkyl</button>
-<input type='file' onchange='importJSON(event)'>
-<div class='box'>
-<h3>Arbetsmoment</h3>
-<input id='taskName' placeholder='Moment'>
-<input id='taskTime' placeholder='Tid (min)' type='number'>
-<button onclick='addTask()'>Lägg till</button>
-<ul id='taskList'></ul>
+body{font-family:Arial;background:#f5f9ff;margin:0}
+.top{background:#0A74DA;padding:15px;color:white;display:flex;gap:20px}
+.box{background:white;margin:15px;padding:15px;border-radius:8px;box-shadow:0 0 6px rgba(0,0,0,0.1)}
+button{background:#0A74DA;color:white;border:none;padding:6px 12px;border-radius:6px}
+</style></head>
+<body>
+<div class='top'>
+ <button onclick="show('calc')">Kalkyl</button>
+ <button onclick="show('reg')">Artikelregister</button>
+ <button onclick="show('tasks')">Arbetsmoment</button>
 </div>
-<div class='box'>
-<h3>Material</h3>
-<ul id='cart'></ul>
-<h3>Total: <span id='sum'></span></h3>
+<div id='calc' class='box'>
+ <h3>Kalkyl</h3>
+ <select id='catSelect'></select>
+ <select id='artSelect'></select>
+ <input id='qty' type='number' placeholder='Mängd'>
+ <button onclick='addItem()'>Lägg till</button>
+ <ul id='calcList'></ul>
+ <h3>Total: <span id='sum'></span></h3>
+</div>
+<div id='reg' class='box' style='display:none'>
+ <h3>Artikelregister</h3>
+ <ul id='regList'></ul>
+</div>
+<div id='tasks' class='box' style='display:none'>
+ <h3>Arbetsmoment</h3>
+ <input id='taskName' placeholder='Namn'>
+ <input id='taskTime' type='number' placeholder='Tid (min)'>
+ <button onclick='addTask()'>Lägg till</button>
+ <ul id='taskList'></ul>
 </div>
 <script>
-let cart = JSON.parse(localStorage.getItem('calc')||'[]');
-let tasks = JSON.parse(localStorage.getItem('tasks')||'[]');
+let articles={};
+let cart=JSON.parse(localStorage.getItem('calc')||'[]');
+let tasks=JSON.parse(localStorage.getItem('tasks')||'[]');
+function show(x){document.getElementById('calc').style.display='none';document.getElementById('reg').style.display='none';document.getElementById('tasks').style.display='none';document.getElementById(x).style.display='block'}
+fetch('articles.json').then(r=>r.json()).then(j=>{articles=j;loadUI();});
+function loadUI(){ let catS=document.getElementById('catSelect'); catS.innerHTML=''; Object.keys(articles.fiber).concat(Object.keys(articles.copper)).forEach(c=>{ let o=document.createElement('option'); o.text=c;catS.add(o);}); updateArts(); renderCalc(); renderReg(); renderTasks(); }
+function updateArts(){ let cat=document.getElementById('catSelect').value; let arr=(articles.fiber[cat]||articles.copper[cat]||[]); let artS=document.getElementById('artSelect'); artS.innerHTML=''; arr.forEach(a=>{let o=document.createElement('option');o.text=a.name;o.value=JSON.stringify(a);artS.add(o);}); }
+document.getElementById('catSelect').onchange=updateArts;
+function addItem(){ let a=JSON.parse(document.getElementById('artSelect').value); let q=parseFloat(document.getElementById('qty').value); if(!q)return; cart.push({name:a.name,unit:a.unit,price:a.price,qty:q}); save(); renderCalc(); }
+function renderCalc(){ let ul=document.getElementById('calcList'); ul.innerHTML=''; let sum=0; cart.forEach((a,i)=>{ let t=a.price*a.qty; sum+=t; ul.innerHTML+=`<li>${a.name} ${a.qty}${a.unit} = ${t}</li>`;}); document.getElementById('sum').innerText=sum; }
+function renderReg(){ let ul=document.getElementById('regList'); ul.innerHTML=''; Object.values(articles.fiber).concat(Object.values(articles.copper)).flat().forEach(a=>{ ul.innerHTML+=`<li>${a.name} (${a.price}/${a.unit})</li>`}); }
+function addTask(){ let n=document.getElementById('taskName').value; let t=parseFloat(document.getElementById('taskTime').value); if(!n||!t)return; tasks.push({name:n,time:t}); save(); renderTasks(); }
+function renderTasks(){ let ul=document.getElementById('taskList'); ul.innerHTML=''; tasks.forEach(x=> ul.innerHTML+=`<li>${x.name} ${x.time}min</li>` ); }
 function save(){ localStorage.setItem('calc',JSON.stringify(cart)); localStorage.setItem('tasks',JSON.stringify(tasks)); }
-function addTask(){ let n=document.getElementById('taskName').value; let t=parseInt(document.getElementById('taskTime').value); if(!n||!t)return; tasks.push({name:n,time:t}); save(); renderTasks(); }
-function renderTasks(){ let d=''; let tot=0; tasks.forEach((x,i)=>{ tot+=x.time; d+=`<li>${x.name} – ${x.time} min</li>`; }); document.getElementById('taskList').innerHTML=d; }
-function render(){ let d=''; let sum=0; cart.forEach(a=>{ let tot=a.price*a.qty; sum+=tot; d+=`<li>${a.name}: ${a.qty} x ${a.price} = ${tot}</li>`; }); document.getElementById('cart').innerHTML=d; document.getElementById('sum').innerText=sum; }
-function exportJSON(){ let data = {cart:cart,tasks:tasks}; let b=new Blob([JSON.stringify(data)],{type:'application/json'}); let u=URL.createObjectURL(b); let a=document.createElement('a'); a.href=u; a.download='kalkyl.json'; a.click(); }
-function importJSON(e){ let f=e.target.files[0]; let r=new FileReader(); r.onload=()=>{ let j=JSON.parse(r.result); cart=j.cart; tasks=j.tasks; save(); render(); renderTasks(); }; r.readAsText(f); }
-render(); renderTasks();
 </script>
 </body></html>
