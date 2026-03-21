@@ -1,1 +1,60 @@
-{"fiber": {"Kablar": [{"name": "OM4 12-fiberkabel 1", "unit": "m", "price": 9.5}]}, "copper": {"Kablar": [{"name": "Cat6 installationskabel typ 1", "unit": "m", "price": 4.6}]}}
+{
+  "fiber": {
+    "Kablar": [
+      {
+        "name": "OM4 fiberkabel 1",
+        "unit": "m",
+        "price": 9.5
+      },
+      {
+        "name": "OM4 fiberkabel 2",
+        "unit": "m",
+        "price": 9.5
+      },
+      {
+        "name": "OM4 fiberkabel 3",
+        "unit": "m",
+        "price": 9.5
+      },
+      {
+        "name": "OM4 fiberkabel 4",
+        "unit": "m",
+        "price": 9.5
+      },
+      {
+        "name": "OM4 fiberkabel 5",
+        "unit": "m",
+        "price": 9.5
+      }
+    ]
+  },
+  "copper": {
+    "Kablar": [
+      {
+        "name": "Cat6 kabel 1",
+        "unit": "m",
+        "price": 4.5
+      },
+      {
+        "name": "Cat6 kabel 2",
+        "unit": "m",
+        "price": 4.5
+      },
+      {
+        "name": "Cat6 kabel 3",
+        "unit": "m",
+        "price": 4.5
+      },
+      {
+        "name": "Cat6 kabel 4",
+        "unit": "m",
+        "price": 4.5
+      },
+      {
+        "name": "Cat6 kabel 5",
+        "unit": "m",
+        "price": 4.5
+      }
+    ]
+  }
+}
