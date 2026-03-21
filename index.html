@@ -1,53 +1,44 @@
 
-<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Fiberkalkyl v7 Pro</title>
-<link rel='manifest' href='manifest.json'>
-<script>navigator.serviceWorker.register('sw.js');</script>
+<!DOCTYPE html><html><head><meta charset='UTF-8'>
+<title>Fiberkalkyl v8</title>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'></script>
 <style>
 body{font-family:Arial;background:#f5f9ff;margin:0}
 .top{background:#0A74DA;padding:15px;color:white;display:flex;gap:20px}
 .box{background:white;margin:15px;padding:15px;border-radius:8px;box-shadow:0 0 6px rgba(0,0,0,0.1)}
 button{background:#0A74DA;color:white;border:none;padding:6px 12px;border-radius:6px}
-</style></head>
-<body>
+</style></head><body>
 <div class='top'>
- <button onclick="show('calc')">Kalkyl</button>
- <button onclick="show('reg')">Artikelregister</button>
- <button onclick="show('tasks')">Arbetsmoment</button>
+<button onclick="show('calc')">Kalkyl</button>
+<button onclick="show('reg')">Artikelregister</button>
+<button onclick="show('tasks')">Arbetsmoment</button>
+<button onclick='exportPDF()'>Exportera PDF</button>
 </div>
-<div id='calc' class='box'>
- <h3>Kalkyl</h3>
- <select id='catSelect'></select>
- <select id='artSelect'></select>
- <input id='qty' type='number' placeholder='Mängd'>
- <button onclick='addItem()'>Lägg till</button>
- <ul id='calcList'></ul>
- <h3>Total: <span id='sum'></span></h3>
-</div>
-<div id='reg' class='box' style='display:none'>
- <h3>Artikelregister</h3>
- <ul id='regList'></ul>
-</div>
-<div id='tasks' class='box' style='display:none'>
- <h3>Arbetsmoment</h3>
- <input id='taskName' placeholder='Namn'>
- <input id='taskTime' type='number' placeholder='Tid (min)'>
- <button onclick='addTask()'>Lägg till</button>
- <ul id='taskList'></ul>
-</div>
+<div id='calc' class='box'><h3>Kalkyl</h3>
+<select id='catSelect'></select>
+<select id='artSelect'></select>
+<input id='qty' type='number' placeholder='Mängd'>
+<button onclick='addItem()'>Lägg till</button>
+<ul id='calcList'></ul>
+<h3>Total: <span id='sum'></span></h3></div>
+<div id='reg' class='box' style='display:none'><h3>Artikelregister</h3><ul id='regList'></ul></div>
+<div id='tasks' class='box' style='display:none'><h3>Arbetsmoment</h3>
+<input id='taskName' placeholder='Namn'>
+<input id='taskTime' type='number' placeholder='Tid (min)'>
+<button onclick='addTask()'>Lägg till</button>
+<ul id='taskList'></ul></div>
 <script>
-let articles={};
-let cart=JSON.parse(localStorage.getItem('calc')||'[]');
-let tasks=JSON.parse(localStorage.getItem('tasks')||'[]');
-function show(x){document.getElementById('calc').style.display='none';document.getElementById('reg').style.display='none';document.getElementById('tasks').style.display='none';document.getElementById(x).style.display='block'}
+let articles={}; let cart=JSON.parse(localStorage.getItem('calc')||'[]'); let tasks=JSON.parse(localStorage.getItem('tasks')||'[]');
+function show(x){['calc','reg','tasks'].forEach(id=>document.getElementById(id).style.display='none'); document.getElementById(x).style.display='block'}
 fetch('articles.json').then(r=>r.json()).then(j=>{articles=j;loadUI();});
-function loadUI(){ let catS=document.getElementById('catSelect'); catS.innerHTML=''; Object.keys(articles.fiber).concat(Object.keys(articles.copper)).forEach(c=>{ let o=document.createElement('option'); o.text=c;catS.add(o);}); updateArts(); renderCalc(); renderReg(); renderTasks(); }
-function updateArts(){ let cat=document.getElementById('catSelect').value; let arr=(articles.fiber[cat]||articles.copper[cat]||[]); let artS=document.getElementById('artSelect'); artS.innerHTML=''; arr.forEach(a=>{let o=document.createElement('option');o.text=a.name;o.value=JSON.stringify(a);artS.add(o);}); }
+function loadUI(){ let cs=document.getElementById('catSelect'); cs.innerHTML=''; let all=Object.keys(articles.fiber).concat(Object.keys(articles.copper)); all.forEach(c=>{let o=document.createElement('option');o.text=c;cs.add(o)}); updateArts(); renderCalc(); renderReg(); renderTasks(); }
+function updateArts(){ let cat=document.getElementById('catSelect').value; let arr=(articles.fiber[cat]||articles.copper[cat]||[]); let as=document.getElementById('artSelect'); as.innerHTML=''; arr.forEach(a=>{let o=document.createElement('option');o.text=a.name;o.value=JSON.stringify(a);as.add(o)}) }
 document.getElementById('catSelect').onchange=updateArts;
-function addItem(){ let a=JSON.parse(document.getElementById('artSelect').value); let q=parseFloat(document.getElementById('qty').value); if(!q)return; cart.push({name:a.name,unit:a.unit,price:a.price,qty:q}); save(); renderCalc(); }
-function renderCalc(){ let ul=document.getElementById('calcList'); ul.innerHTML=''; let sum=0; cart.forEach((a,i)=>{ let t=a.price*a.qty; sum+=t; ul.innerHTML+=`<li>${a.name} ${a.qty}${a.unit} = ${t}</li>`;}); document.getElementById('sum').innerText=sum; }
-function renderReg(){ let ul=document.getElementById('regList'); ul.innerHTML=''; Object.values(articles.fiber).concat(Object.values(articles.copper)).flat().forEach(a=>{ ul.innerHTML+=`<li>${a.name} (${a.price}/${a.unit})</li>`}); }
-function addTask(){ let n=document.getElementById('taskName').value; let t=parseFloat(document.getElementById('taskTime').value); if(!n||!t)return; tasks.push({name:n,time:t}); save(); renderTasks(); }
-function renderTasks(){ let ul=document.getElementById('taskList'); ul.innerHTML=''; tasks.forEach(x=> ul.innerHTML+=`<li>${x.name} ${x.time}min</li>` ); }
-function save(){ localStorage.setItem('calc',JSON.stringify(cart)); localStorage.setItem('tasks',JSON.stringify(tasks)); }
-</script>
-</body></html>
+function addItem(){ let a=JSON.parse(document.getElementById('artSelect').value); let q=parseFloat(document.getElementById('qty').value); if(!q)return; cart.push({name:a.name,unit:a.unit,price:a.price,qty:q}); save(); renderCalc() }
+function renderCalc(){ let ul=document.getElementById('calcList'); ul.innerHTML=''; let sum=0; cart.forEach(a=>{let t=a.price*a.qty; sum+=t; ul.innerHTML+=`<li>${a.name} ${a.qty}${a.unit} = ${t.toFixed(2)}</li>`}); document.getElementById('sum').innerText=sum.toFixed(2) }
+function renderReg(){ let ul=document.getElementById('regList'); ul.innerHTML=''; Object.values(articles.fiber).concat(Object.values(articles.copper)).flat().forEach(a=>ul.innerHTML+=`<li>${a.name} (${a.price}/${a.unit})</li>`)}
+function addTask(){ let n=document.getElementById('taskName').value; let t=parseFloat(document.getElementById('taskTime').value); if(!n||!t)return; tasks.push({name:n,time:t}); save(); renderTasks() }
+function renderTasks(){ let ul=document.getElementById('taskList'); ul.innerHTML=''; tasks.forEach(x=>ul.innerHTML+=`<li>${x.name} ${x.time}min</li>`) }
+function save(){ localStorage.setItem('calc',JSON.stringify(cart)); localStorage.setItem('tasks',JSON.stringify(tasks)) }
+async function exportPDF(){ const { jsPDF } = window.jspdf; let doc=new jsPDF(); doc.text('Fiberkalkyl PDF',10,10); let y=20; cart.forEach(a=>{doc.text(`${a.name} ${a.qty}${a.unit} = ${a.price*a.qty}kr`,10,y); y+=10}); doc.save('kalkyl.pdf') }
+</script></body></html>
